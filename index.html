@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Search Bar Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="stylesheets/flexbox.css" />
+  <link rel="stylesheet" href="stylesheets/page.css" />
+  
+  <link href='https://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+  <div class="header flex-vcontainer-center p-a-2">
+    <h1 class="header-title flex-item p-y-2">Remember</h1>
+    <form autocomplete="off" id="searchForm" class="p-b-2 flex-item-10 flex-container-nowrap">
+      <input class="flex-item flex-item-grow text-input" type="text" id="searchBar">
+      <button class="flex-item button" type="submit">Remember</button>
+    </form>
+  </div>
+
+  <div class="recent flex-vcontainer-center">
+    <h2 class="recent-title">Recent Memories</h2>
+    <button class="button clear-button" type="button" id="clearStorage">Clear Memory</button>
+    <ul class="recent-list" id="recentSearchList"></ul>
+  </div>
+
+  <script type="text/javascript">
+    'use strict';
+    function supportsLocalStorage() {
+      try {
+        return 'localStorage' in window && window['localStorage'] !== null;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function getRecentSearches() {
+      var searches = localStorage.getItem('recentSearches');
+      if (searches) {
+        return JSON.parse(searches);
+      } else {
+        return [];
+      }
+    }
+
+    function saveSearchString(string) {
+      var searches = getRecentSearches();
+      if (!string || searches.indexOf(string) > -1 ) {
+        return false;
+      }
+      searches.push(string);
+      localStorage.setItem('recentSearches', JSON.stringify(searches));
+      return true;
+    }
+
+    function removeSearches() {
+      localStorage.removeItem('recentSearches');
+      
+    }
+
+    // Create an li, given string contents, append to the supplied ul
+    function appendListItem(listElement, string) {
+      var listItemElement = document.createElement('LI');
+      listItemElement.innerHTML = string;
+      listElement.appendChild(listItemElement);
+    }
+
+    // Empty the contents of an element (ul)
+    function clearList(listElement) {
+      listElement.innerHTML = '';
+    }
+
+ 
+    window.onload = function() {
+        if ( supportsLocalStorage() ){
+          var searchForm = document.getElementById('searchForm');
+          var searchBar = document.getElementById('searchBar');
+          var recentSearchList = document.getElementById('recentSearchList');
+          var clearButton = document.getElementById('clearStorage');
+    
+          // Initialize display list
+          var recentSearches = getRecentSearches();
+          recentSearches.forEach(function(searchString) {
+            appendListItem(recentSearchList,searchString);
+          });
+    
+          // Set event handlers
+          searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            var searchString = searchBar.value;
+            console.log('test');
+            if (saveSearchString(searchString)) {
+              appendListItem(recentSearchList, searchString);
+            }
+          });
+    
+          clearButton.addEventListener('click', function(event) {
+            removeSearches();
+            clearList(recentSearchList);
+          });
+        }
+    };
+
+    
+  </script>
+</body>
+</html>
